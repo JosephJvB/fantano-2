@@ -1,0 +1,44 @@
+---
+import type { GetStaticPaths } from 'astro'
+import playlistsJson from '../../../public/spotify-playlists.json'
+import Layout from '../../layouts/Layout.astro'
+import TrackList from '../../components/TrackList.svelte'
+
+const playlists = playlistsJson as unknown as Array<{
+  id: string
+  name: string
+  description: string
+  trackIds: string[]
+}>
+export const getStaticPaths = (() => {
+  const playlists = playlistsJson as unknown as Array<{
+    id: string
+    name: string
+    description: string
+    trackIds: string[]
+  }>
+  return playlists.map((p) => ({
+    params: { playlistId: p.id },
+  }))
+}) satisfies GetStaticPaths
+
+const { playlistId } = Astro.params
+const playlist = playlists.find((p) => p.id === playlistId)
+// cant access url query params tho cos I'm doing SSG
+// so can't redirect here!
+---
+
+<style>
+  h1 {
+    text-align: center;
+  }
+  p {
+    text-align: center;
+  }
+</style>
+<Layout title=`playlist | ${playlist?.name.replace("TONY'S TOP TRACKS ", '')}`>
+  <main>
+    <h1>{playlist?.name}</h1>
+    <TrackList client:only trackIds={playlist?.trackIds ?? []} />
+  </main>
+</Layout>
