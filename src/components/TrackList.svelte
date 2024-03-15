@@ -2,14 +2,15 @@
   import { onMount } from 'svelte'
   import type { ISpotifyTrack } from 'jvb-spotty-models'
   import Pagination from './Pagination.svelte'
+  import { PAGE_LIMIT } from '../lib/spotifyApi'
 
   export let tracks: ISpotifyTrack[]
   $: pageQuery = parseInt(
     new URLSearchParams(window.location.search).get('p') ?? '1'
   )
-  $: lowerLimit = (pageQuery - 1) * 100
-  $: numPages = Math.ceil(tracks.length / 100)
-  $: pageTracks = tracks.slice(lowerLimit, pageQuery * 100)
+  $: lowerLimit = (pageQuery - 1) * PAGE_LIMIT
+  $: numPages = Math.ceil(tracks.length / PAGE_LIMIT)
+  $: pageTracks = tracks.slice(lowerLimit, pageQuery * PAGE_LIMIT)
 
   onMount(() => {
     // first page
@@ -39,7 +40,7 @@
   {pageQuery}
 />
 <ul>
-  {#each tracks as track}
+  {#each pageTracks as track}
     <li class="track loaded">
       "{track.name}" by {track.artists[0].name}
     </li>

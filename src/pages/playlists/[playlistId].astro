@@ -1,32 +1,51 @@
 ---
 import type { GetStaticPaths } from 'astro'
-import playlistsJson from '../../../public/spotify-playlists.json'
 import Layout from '../../layouts/Layout.astro'
 import TrackList from '../../components/TrackList.svelte'
 import type { ISpotifyTrack } from 'jvb-spotty-models'
+import { getAllTracks } from '../../lib/spotifyApi'
+import { loadS3PlaylistsJson, type S3PlaylistJson } from '../../lib/s3Json'
 
-export const getStaticPaths = (() => {
-  // TODO: load from S3
-  const playlists = playlistsJson as unknown as Array<{
-    id: string
-    name: string
-    description: string
-    trackIds: string[]
-    year: number
-  }>
-  return playlists.map((p) => ({
-    params: { playlistId: p.id },
-    props: {
-      playlist: {
-        ...p,
-        year: parseInt(p.name.replace("TONY'S TOP TRACKS ", '')),
-        // TODO: load tracks from Spotify
-        tracks: p.trackIds.map((id) => ({
-          id: id,
+// i should really do this differently for DEV vs LIVE
+export const getStaticPaths = (async () => {
+  const playlists = await loadS3PlaylistsJson()
+
+  const playlistsWithTracks: Array<
+    S3PlaylistJson & {
+      year: number
+      tracks: ISpotifyTrack[]
+    }
+  > = []
+
+  // could run these concurrently
+  if (import.meta.env.PROD) {
+    // loading all spotify tracks kinda spenny
+    for (const playlist of playlists) {
+      const tracks = await getAllTracks(playlist.trackIds)
+      playlistsWithTracks.push({
+        ...playlist,
+        year: parseInt(playlist.name.replace("TONY'S TOP TRACKS ", '')),
+        tracks,
+      })
+    }
+  } else {
+    for (const playlist of playlists) {
+      playlistsWithTracks.push({
+        ...playlist,
+        year: parseInt(playlist.name.replace("TONY'S TOP TRACKS ", '')),
+        tracks: playlist.trackIds.map((id) => ({
+          id,
           name: `name_${id.substring(0, 5)}`,
-          artists: [{ name: `artist_${id.substring(0, 5)}` }],
+          artists: [{ name: `name_${id.substring(0, 5)}` }],
         })) as ISpotifyTrack[],
-      },
+      })
+    }
+  }
+
+  return playlistsWithTracks.map((playlist) => ({
+    params: { playlistId: playlist.id },
+    props: {
+      playlist,
     },
   }))
 }) satisfies GetStaticPaths
