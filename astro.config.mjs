@@ -5,6 +5,9 @@ import svelte from '@astrojs/svelte'
 // https://astro.build/config
 export default defineConfig({
   integrations: [svelte()],
+  server: {
+    port: 3000,
+  },
   // wanna do SSG actually
   // output: 'server',
 })

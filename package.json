@@ -7,7 +7,8 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest"
   },
   "dependencies": {
     "@astrojs/check": "^0.5.9",
@@ -17,6 +18,8 @@
     "typescript": "^5.4.2"
   },
   "devDependencies": {
-    "jvb-spotty-models": "^0.0.11"
+    "@types/node": "^20.11.28",
+    "jvb-spotty-models": "^0.0.11",
+    "vitest": "^1.4.0"
   }
 }
