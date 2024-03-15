@@ -3,29 +3,37 @@ import type { GetStaticPaths } from 'astro'
 import playlistsJson from '../../../public/spotify-playlists.json'
 import Layout from '../../layouts/Layout.astro'
 import TrackList from '../../components/TrackList.svelte'
+import type { ISpotifyTrack } from 'jvb-spotty-models'
 
-const playlists = playlistsJson as unknown as Array<{
-  id: string
-  name: string
-  description: string
-  trackIds: string[]
-}>
 export const getStaticPaths = (() => {
+  // TODO: load from S3
   const playlists = playlistsJson as unknown as Array<{
     id: string
     name: string
     description: string
     trackIds: string[]
+    year: number
   }>
   return playlists.map((p) => ({
     params: { playlistId: p.id },
+    props: {
+      playlist: {
+        ...p,
+        year: parseInt(p.name.replace("TONY'S TOP TRACKS ", '')),
+        // TODO: load tracks from Spotify
+        tracks: p.trackIds.map((id) => ({
+          id: id,
+          name: `name_${id.substring(0, 5)}`,
+          artists: [{ name: `artist_${id.substring(0, 5)}` }],
+        })) as ISpotifyTrack[],
+      },
+    },
   }))
 }) satisfies GetStaticPaths
 
-const { playlistId } = Astro.params
-const playlist = playlists.find((p) => p.id === playlistId)
 // cant access url query params tho cos I'm doing SSG
 // so can't redirect here!
+const { playlist } = Astro.props
 ---
 
 <style>
@@ -36,9 +44,9 @@ const playlist = playlists.find((p) => p.id === playlistId)
     text-align: center;
   }
 </style>
-<Layout title=`playlist | ${playlist?.name.replace("TONY'S TOP TRACKS ", '')}`>
+<Layout title=`playlist | ${playlist.year}`>
   <main>
-    <h1>{playlist?.name}</h1>
-    <TrackList client:only trackIds={playlist?.trackIds ?? []} />
+    <h1>{playlist.name}</h1>
+    <TrackList client:only tracks={playlist.tracks} />
   </main>
 </Layout>

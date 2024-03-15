@@ -15,5 +15,8 @@
     "astro": "^4.5.3",
     "svelte": "^4.2.12",
     "typescript": "^5.4.2"
+  },
+  "devDependencies": {
+    "jvb-spotty-models": "^0.0.11"
   }
 }

@@ -1,14 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import type { ISpotifyTrack } from 'jvb-spotty-models'
   import Pagination from './Pagination.svelte'
 
-  export let trackIds: string[]
+  export let tracks: ISpotifyTrack[]
   $: pageQuery = parseInt(
     new URLSearchParams(window.location.search).get('p') ?? '1'
   )
   $: lowerLimit = (pageQuery - 1) * 100
-  $: numPages = Math.ceil(trackIds.length / 100)
-  $: pageTracks = trackIds.slice(lowerLimit, pageQuery * 100)
+  $: numPages = Math.ceil(tracks.length / 100)
+  $: pageTracks = tracks.slice(lowerLimit, pageQuery * 100)
 
   onMount(() => {
     // first page
@@ -27,51 +28,27 @@
       return
     }
   })
-
-  $: loadTracks = new Promise<
-    Array<{
-      id: string
-      name: string
-      artists: Array<{ name: string }>
-    }>
-  >((r) =>
-    setTimeout(() => {
-      r(
-        pageTracks.map((id) => ({
-          id: id,
-          name: `name_${id.substring(0, 5)}`,
-          artists: [{ name: `artist_${id.substring(0, 5)}` }],
-        }))
-      )
-    }, 300)
-  )
 </script>
 
 <Pagination
   itemLabel="tracks"
   pageItemCount={pageTracks.length}
-  totalItemCount={trackIds.length}
+  totalItemCount={tracks.length}
   {lowerLimit}
   {numPages}
   {pageQuery}
 />
 <ul>
-  {#await loadTracks}
-    {#each pageTracks as _}
-      <li class="track loading"></li>
-    {/each}
-  {:then loadedTracks}
-    {#each loadedTracks as track}
-      <li class="track loaded">
-        "{track.name}" by {track.artists[0].name}
-      </li>
-    {/each}
-  {/await}
+  {#each tracks as track}
+    <li class="track loaded">
+      "{track.name}" by {track.artists[0].name}
+    </li>
+  {/each}
 </ul>
 <Pagination
   itemLabel="tracks"
   pageItemCount={pageTracks.length}
-  totalItemCount={trackIds.length}
+  totalItemCount={tracks.length}
   {lowerLimit}
   {numPages}
   {pageQuery}

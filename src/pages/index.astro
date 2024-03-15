@@ -3,15 +3,21 @@ import Layout from '../layouts/Layout.astro'
 import Card from '../components/Card.astro'
 import playlistsJson from '../../public/spotify-playlists.json'
 
-const playlists = playlistsJson as unknown as Array<{
-  id: string
-  name: string
-  description: string
-  trackIds: string[]
-}>
+const playlists = (
+  playlistsJson as unknown as Array<{
+    id: string
+    name: string
+    description: string
+    trackIds: string[]
+  }>
+).map((p) => ({
+  ...p,
+  year: parseInt(p.name.replace("TONY'S TOP TRACKS ", '')),
+}))
+playlists.sort((a, z) => z.year - a.year)
 ---
 
-<Layout title="Welcome to Astro.">
+<Layout title="Tony's Top Tracks">
   <main>
     <h1>Tony's Top Tracks</h1>
     <p class="instructions">
@@ -23,7 +29,7 @@ const playlists = playlistsJson as unknown as Array<{
         playlists.map((playlist) => (
           <Card
             href={`/playlists/${playlist.id}`}
-            title={`${playlist.name.replace("TONY'S TOP TRACKS ", '')} playlist`}
+            title={`${playlist.year} playlist`}
             body={`x${playlist.trackIds.length} tracks`}
           />
         ))
