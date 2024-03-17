@@ -69,8 +69,4 @@
     margin-bottom: 10px;
     background-color: grey;
   }
-  .loading {
-  }
-  .loaded {
-  }
 </style>

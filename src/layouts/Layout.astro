@@ -1,5 +1,6 @@
 ---
-import Nav from '../components/Nav.svelte'
+import Modals from '../components/Modals.svelte'
+
 interface Props {
   title: string
 }
@@ -8,20 +9,38 @@ const { title } = Astro.props
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang='en'>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="description" content="Astro description" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
+    <meta charset='UTF-8' />
+    <meta name='description' content='Astro description' />
+    <meta name='viewport' content='width=device-width' />
+    <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
+    <meta name='generator' content={Astro.generator} />
     <title>{title}</title>
+    <script></script>
   </head>
   <body>
-    <Nav client:load />
+    <!-- <Nav client:load /> -->
+    <Modals client:only />
+    <nav>
+      <a aria-details='home page link' href='/'>🍉</a>
+    </nav>
     <slot />
   </body>
 </html>
+<style>
+  nav {
+    line-height: 1;
+    position: relative;
+  }
+  nav a {
+    text-decoration: none;
+    position: absolute;
+    font-size: 4rem;
+    left: 20px;
+    top: -2px;
+  }
+</style>
 <style is:global>
   :root {
     --accent: 136, 58, 234;
@@ -52,5 +71,30 @@ const { title } = Astro.props
   }
   * {
     color: white;
+  }
+  main {
+    margin: auto;
+    padding: 1rem;
+    padding-top: 0;
+    width: 800px;
+    max-width: calc(100% - 2rem);
+    font-size: 20px;
+    line-height: 1.6;
+  }
+  .astro-a {
+    position: absolute;
+    top: -32px;
+    left: 50%;
+    transform: translatex(-50%);
+    width: 220px;
+    height: auto;
+    z-index: -1;
+  }
+  h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    margin-bottom: 1em;
   }
 </style>

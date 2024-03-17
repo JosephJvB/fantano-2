@@ -1,4 +1,4 @@
-import type { ISpotifyTrack } from 'jvb-spotty-models'
+import type { ISpotifyTokenResponse, ISpotifyTrack } from 'jvb-spotty-models'
 
 // limited to 50? even tho docs say 100
 // https://developer.spotify.com/documentation/web-api/reference/get-several-tracks
@@ -125,4 +125,46 @@ const requestBasicToken = async () => {
   }
 
   return (json as { access_token: string }).access_token
+}
+
+export const getCallbackUrl = () => {
+  const searchParams = new URLSearchParams({
+    response_type: 'code',
+    client_id: import.meta.env.SPOTIFY_CLIENT_ID,
+    scope:
+      'user-read-private user-read-email user-top-read user-read-recently-played',
+    redirect_uri: import.meta.env.PUBLIC_SPOTIFY_REDIRECT_URL,
+  })
+
+  return 'https://accounts.spotify.com/authorize?' + searchParams
+}
+
+export type SpotifyToken = ISpotifyTokenResponse & {
+  ts: number
+}
+export const submitAuthCode = async (authCode: string) => {
+  const searchParams = new URLSearchParams({
+    code: authCode,
+    grant_type: 'authorization_code',
+    redirect_uri: import.meta.env.PUBLIC_SPOTIFY_REDIRECT_URL,
+  })
+
+  const response = await fetch(
+    'https://accounts.spotify.com/api/token?' + searchParams,
+    {
+      method: 'post',
+      headers: getBasicAuthHeaders(),
+    }
+  )
+
+  const json = await response.json()
+
+  if (!response.ok) {
+    throw new Error('submitAuthCode failed:\n' + JSON.stringify(json))
+  }
+
+  return {
+    ...json,
+    ts: Date.now(),
+  } as SpotifyToken
 }

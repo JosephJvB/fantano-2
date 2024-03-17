@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro'
-import Card from '../components/Card.astro'
+import PlaylistCard from '../components/PlaylistCard.svelte'
 import playlistsJson from '../../public/spotify-playlists.json'
 
 const playlists = (
@@ -18,19 +18,23 @@ playlists.sort((a, z) => z.year - a.year)
 ---
 
 <Layout title="Tony's Top Tracks">
+  <h1>Home</h1>
   <main>
-    <h1>Tony's Top Tracks</h1>
-    <p class="instructions">
-      Hi everyone webthony sitetano here. This week we are taking a look at my
-      favourite weekly tracks.
+    <p class='instructions'>
+      Hi everyone webthony sitetano here. <br />This week we are taking a look
+      at one melon's favourite tracks.
     </p>
-    <ul role="list" class="link-card-grid">
+    <ul role='list' class='link-card-grid'>
       {
         playlists.map((playlist) => (
-          <Card
-            href={`/playlists/${playlist.id}`}
-            title={`${playlist.year} playlist`}
-            body={`x${playlist.trackIds.length} tracks`}
+          <PlaylistCard
+            client:only
+            playlist={{
+              id: playlist.id,
+              year: playlist.year,
+              numTracks: playlist.trackIds.length,
+              liked: false,
+            }}
           />
         ))
       }
@@ -39,30 +43,6 @@ playlists.sort((a, z) => z.year - a.year)
 </Layout>
 
 <style>
-  main {
-    margin: auto;
-    padding: 1rem;
-    width: 800px;
-    max-width: calc(100% - 2rem);
-    font-size: 20px;
-    line-height: 1.6;
-  }
-  .astro-a {
-    position: absolute;
-    top: -32px;
-    left: 50%;
-    transform: translatex(-50%);
-    width: 220px;
-    height: auto;
-    z-index: -1;
-  }
-  h1 {
-    font-size: 4rem;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
-    margin-bottom: 1em;
-  }
   .text-gradient {
     background-image: var(--accent-gradient);
     -webkit-background-clip: text;

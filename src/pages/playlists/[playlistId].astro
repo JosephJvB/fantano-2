@@ -19,7 +19,7 @@ export const getStaticPaths = (async () => {
 
   // could run these concurrently
   if (import.meta.env.PROD) {
-    // loading all spotify tracks kinda spenny
+    // loading all spotify tracks during dev is kinda spenny
     for (const playlist of playlists) {
       const tracks = await getAllTracks(playlist.trackIds)
       playlistsWithTracks.push({
@@ -64,8 +64,8 @@ const { playlist } = Astro.props
   }
 </style>
 <Layout title=`playlist | ${playlist.year}`>
+  <h1>{playlist.year.toString()}</h1>
   <main>
-    <h1>{playlist.name}</h1>
     <TrackList client:only tracks={playlist.tracks} />
   </main>
 </Layout>

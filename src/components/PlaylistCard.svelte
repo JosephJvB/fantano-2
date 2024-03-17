@@ -1,24 +1,38 @@
----
-interface Props {
-  title: string
-  body: string
-  href: string
-}
+<script lang="ts">
+  import Like from './Like.svelte'
+  import { getSpotifyCookie } from '../lib/cookies'
+  import { modalStore } from '../lib/modals'
 
-const { href, title, body } = Astro.props
----
+  export let playlist: {
+    id: string
+    year: number
+    numTracks: number
+    liked: boolean
+  }
 
-<li class='link-card'>
-  <a href={href}>
+  function clickLike() {
+    console.log('clicked', playlist.id)
+    const token = getSpotifyCookie()
+    if (!token) {
+      // open modal to start login
+      modalStore.set('spotify-login')
+    }
+  }
+</script>
+
+<li class="link-card">
+  <Like on:like={clickLike} liked={playlist.liked} />
+  <a href={`/playlists/${playlist.id}`}>
     <h2>
-      {title}
+      {`${playlist.year} playlist`}
       <span>&rarr;</span>
     </h2>
     <p>
-      {body}
+      {`x${playlist.numTracks} tracks`}
     </p>
   </a>
 </li>
+
 <style>
   .link-card {
     position: relative;
