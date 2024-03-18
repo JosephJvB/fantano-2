@@ -1,53 +1,83 @@
 <script lang="ts">
   import { type ModalType, modalStore } from '../lib/modals'
 
+  // https://svelte.dev/examples/modal
+  let dialogRef: HTMLDialogElement
+
   let currentModalType: ModalType | null
   $: currentModalType = null
 
-  // need to close on outside click
-  // attach an event listener to window / body?
-  modalStore.subscribe((type: ModalType) => {
+  modalStore.subscribe((type: ModalType | null) => {
     currentModalType = type
+
+    if (!dialogRef) {
+      return
+    }
+
+    if (type === null) {
+      document.body.style.overflowY = 'initial'
+      dialogRef.close()
+    } else {
+      document.body.style.overflowY = 'hidden'
+      dialogRef.showModal()
+    }
   })
 </script>
 
-{#if currentModalType === 'spotify-login'}
-  <!-- struggling to get this element to be full height of html body -->
-  <div
-    id="modal-background"
-    on:click={() => {
-      modalStore.set(null)
-    }}
-  >
-    <div id="modal-container" aria-modal="true" on:click|stopPropagation>
-      <iframe title="login with spotify" src="/spotify-login" frameborder="0" />
-    </div>
+<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
+<dialog
+  bind:this={dialogRef}
+  on:close={() => modalStore.set(null)}
+  on:click|self={() => modalStore.set(null)}
+>
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div id="modal-container" on:click|stopPropagation>
+    <button class="close-button" on:click={() => dialogRef.close()}>x</button>
+    {#if currentModalType === 'spotify-login'}
+      <iframe
+        allow="frame-ancestors 'self' accounts.spotify.com"
+        title="login with spotify"
+        src="/spotify-login"
+        frameborder="0"
+      />
+    {/if}
   </div>
-{/if}
+</dialog>
 
 <style>
-  #modal-background {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    display: flex;
+  dialog {
+    border-radius: 0.2em;
+    border: none;
+    padding: 0;
+    overflow: hidden;
+  }
+  dialog::backdrop {
+    background: rgba(0, 0, 0, 0.3);
   }
   #modal-container {
-    position: sticky;
-    height: 80vh;
-    width: 80vw;
+    height: 600px;
+    width: 500px;
+    max-width: 100%;
     border: solid white 1px;
     border-radius: 5px;
-    z-index: 2;
-    /* left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%); */
-    margin: auto;
+    position: relative;
+  }
+  #modal-container .close-button {
+    all: unset;
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: black;
+    color: white;
+    border: solid 1px white;
+    position: absolute;
+    top: 5px;
+    right: 5px;
   }
   iframe {
     width: 100%;
     height: 100%;
+  }
+  iframe body {
+    margin: 0;
   }
 </style>

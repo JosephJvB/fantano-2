@@ -9,3 +9,5 @@ I started to do a bunch of Spotify API stuff
   - liking playlists
 
 But really I should just link out to spotify I reckon. Why try re-create their UI (learning?).
+
+https://svelte.dev/examples/hello-world

@@ -11,7 +11,6 @@
   }
 
   function clickLike() {
-    console.log('clicked', playlist.id)
     const token = getSpotifyCookie()
     if (!token) {
       // open modal to start login
@@ -20,21 +19,26 @@
   }
 </script>
 
-<li class="link-card">
+<li class="playlist-card">
   <Like on:like={clickLike} liked={playlist.liked} />
-  <a href={`/playlists/${playlist.id}`}>
+  <div class="content">
     <h2>
-      {`${playlist.year} playlist`}
-      <span>&rarr;</span>
+      <a
+        target="_blank"
+        href={`https://open.spotify.com/playlist/${playlist.id}`}
+      >
+        {`${playlist.year} playlist`}
+        <span>&rarr;</span>
+      </a>
     </h2>
     <p>
       {`x${playlist.numTracks} tracks`}
     </p>
-  </a>
+  </div>
 </li>
 
 <style>
-  .link-card {
+  .playlist-card {
     position: relative;
     list-style: none;
     display: flex;
@@ -47,7 +51,7 @@
     transition: background-position 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
   }
-  .link-card > a {
+  .playlist-card > .content {
     width: 100%;
     text-decoration: none;
     line-height: 1.4;
@@ -65,11 +69,11 @@
     margin-top: 0.5rem;
     margin-bottom: 0;
   }
-  .link-card:is(:hover, :focus-within) {
+  .playlist-card:is(:hover, :focus-within) {
     background-position: 0;
     background-image: var(--accent-gradient);
   }
-  .link-card:is(:hover, :focus-within) h2 {
+  .playlist-card:is(:hover, :focus-within) h2 {
     color: rgb(var(--accent-light));
   }
 </style>
